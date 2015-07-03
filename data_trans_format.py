@@ -35,7 +35,7 @@ d = {}
 for i in range(categorical.shape[1]):
     temp = CatEncoder(categorical.iloc[::,i])
     res[:,i] = temp[0]
-    d[categorical.iloc[::,i].name] = temp[1]
+    d[categorical.iloc[::,i].name] = temp[1] #save the dictionary so we can perform same conversion on all data
 
 #join the 2 matrices into a numpy matrix
 numerical = numerical.as_matrix()
