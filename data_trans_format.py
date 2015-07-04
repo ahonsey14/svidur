@@ -16,15 +16,8 @@ def CatEncoder(col):
 engine = create_engine('mysql://root:@localhost:3306/cat')
 
 #query your DB using pandas, and your engine
-data = pd.read_sql(("SELECT train.tube_assembly_id, train.supplier, train.quote_date, \
-train.annual_usage, train.min_order_quantity, train.bracket_pricing, train.quantity, \
-train.cost, tube.material_id, tube.diameter, tube.material_id, tube.diameter, tube.wall,\
-tube.length, tube.num_bends, tube.bend_radius, tube.end_a_1x, tube.end_a_2x, tube.end_x_1x,\
-tube.end_x_2x, tube.end_a, tube.end_x, tube.num_boss, tube.num_bracket, tube.other,\
-specs.spec1, specs.spec2, specs.spec3, specs.spec4, specs.spec5, specs.spec6,\
-specs.spec7, specs.spec8, specs.spec9, specs.spec10 \
-FROM train_set as train JOIN tube ON train.tube_assembly_id = tube.tube_assembly_id JOIN specs ON train.tube_assembly_id = specs.tube_assembly_id"),
-engine)
+data = pd.read_sql("SELECT train.tube_assembly_id, train.supplier, train.quote_date, train.annual_usage, train.min_order_quantity, train.bracket_pricing, train.quantity, train.cost, tube.material_id, tube.diameter, tube.material_id, tube.diameter, tube.wall, tube.length, tube.num_bends, tube.bend_radius, tube.end_a_1x, tube.end_a_2x, tube.end_x_1x, tube.end_x_2x, tube.end_a, tube.end_x, tube.num_boss, tube.num_bracket, tube.other, specs.spec1, specs.spec2, specs.spec3, specs.spec4, specs.spec5, specs.spec6, specs.spec7, specs.spec8, specs.spec9, specs.spec10 FROM train_set JOIN tube ON train.tube_assembly_id = tube.tube_assembly_id JOIN specs ON train.tube_assembly_id = specs.tube_assembly_id",
+                  engine)
 
 #replace nas with 0
 data = data.fillna(0)
@@ -32,7 +25,6 @@ data = data.fillna(0)
 #seperate numerical and categorical
 numerical = data.select_dtypes(include = [np.float64, np.int64]) # sub out those that equal int64, float64
 categorical = data.select_dtypes(exclude = [np.float64, np.int64])
-cat_names = list(categorical.columns.values)
 
 #replace categorical
 # matrix of same size as categorical
@@ -47,8 +39,10 @@ for i in range(categorical.shape[1]):
     res[:,i] = temp[0]
     d[categorical.iloc[::,i].name] = temp[1] #save the dictionary so we can perform same conversion on all data
 
+names = d.keys()
+
 categorical = pd.DataFrame(res)
-categorical.columns = cat_names # this isnt matching up
+categorical.columns = names # this isnt matching up
 
 #join the 2 matrices into a dataframe, need to check column names
 

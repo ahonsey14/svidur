@@ -4,11 +4,11 @@ from re import findall # regular expressions
 from sqlalchemy import create_engine # your engine rears its ugly head
 
 # the path where your downloaded files are
-dir_path = '/Users/jamesquadrino/Desktop/competition_data/'
+dir_path = '/home/ubuntu/competition_data/'
 # files in that folder
 files = listdir(dir_path)[1::]
 
-engine = create_engine('mysql://root:@localhost:3306/cat')
+engine = create_engine('mysql://root:joemoney@localhost:3306/cat')
 
 #go through your files, read the csv, name the table according to filename, add table to cat
 for fi in files:
