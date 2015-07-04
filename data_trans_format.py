@@ -1,6 +1,7 @@
 #pandas is for r dataframe like structures in python, highly recommended generally
 import pandas as pd
 import numpy as np
+from sklearn import preprocessing
 from sqlalchemy import create_engine #sql alchemy module, to connect to your database
 
 def CatEncoder(col):
@@ -46,13 +47,18 @@ categorical.columns = names # this isnt matching up
 #join the 2 matrices into a dataframe, need to check column names
 
 data_trans = pd.concat((numerical,categorical),1)
+n = data_trans.columns
+data_trans = preprocessing.scale(data_trans)
 
 #output in the FANN friendly format... yuck
 #this takes forever, needs to be chunked up or something... but it works
 
+data_trans = pd.DataFrame(data_trans)
+data_trans.columns = n
+
 shape = data_trans.shape
 f = open("/Users/jamesquadrino/git/svidur/data_train.data", "w")
-text = str(shape[0]) + " " + str(shape[1]) + " " + str(1) + "\n"
+text = str(shape[0]) + " " + str(shape[1]-1) + " " + str(1) + "\n"
 f.writelines(text)
 
 y = data_trans.ix[0,"cost"]

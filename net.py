@@ -1,46 +1,31 @@
-#pandas is for r dataframe like structures in python, highly recommended generally
-import pandas as pd
-import numpy as np
-from sqlalchemy import create_engine #sql alchemy module, to connect to your database
+from fann2 import libfann as pyfann
 
-def CatEncoder(col):
-    t = col.astype("category")
-    t_categories = list(t.cat.categories)
-    original = dict((key, value) for (key, value) in zip(t_categories, range(len(t_categories))))
-    t2 = t.cat.rename_categories(original.values())
-    return t2, original
+connection_rate = .5
+learning_rate = 0.7
+num_input = 34
+num_neurons_hidden_1 = 10
+num_neurons_hidden_2 = 50
+num_neurons_hidden_3 = 5
+num_output = 1
 
-#create an engine to connect/add tables/read from sql
-#requires credentials for your db, the ones i have entered are default for a database named cat
-engine = create_engine('mysql://root:@localhost:3306/cat')
+desired_error = 0.0001
+max_iterations = 100000
+iterations_between_reports = 1000
 
-#query your DB using pandas, and your engine
-data = pd.read_sql("SELECT train.tube_assembly_id, train.supplier, train.quote_date, train.annual_usage, train.min_order_quantity, train.bracket_pricing, train.quantity, train.cost, tube.material_id, tube.diameter, tube.material_id, tube.diameter, tube.wall, tube.length, tube.num_bends, tube.bend_radius, tube.end_a_1x, tube.end_a_2x, tube.end_x_1x, tube.end_x_2x, tube.end_a, tube.end_x, tube.num_boss, tube.num_bracket, tube.other, specs.spec1, specs.spec2, specs.spec3, specs.spec4, specs.spec5, specs.spec6, specs.spec7, specs.spec8, specs.spec9, specs.spec10 FROM train JOIN tube ON train.tube_assembly_id = tube.tube_assembly_id JOIN specs ON train.tube_assembly_id = specs.tube_assembly_id",
-                  engine)
+training = pyfann.training_data()
+training.read_train_from_file("/Users/jamesquadrino/git/svidur/data_train.data")
 
-#replace nas with 0
-data = data.fillna(0)
 
-#dummy vars
-numerical = data.select_dtypes(include = [np.float64, np.int64]) # sub out those that equal int64, float64
-categorical = data.select_dtypes(exclude = [np.float64, np.int64])
+ann = pyfann.neural_net()
+ann.create_sparse_array(connection_rate, (num_input,num_neurons_hidden_1, num_output))
+ann.set_learning_rate(learning_rate)
+ann.set_activation_function_hidden(pyfann.SIGMOID_SYMMETRIC_STEPWISE)
+ann.set_activation_function_output(pyfann.SIGMOID_SYMMETRIC_STEPWISE)
+ann.set_training_algorithm(pyfann.TRAIN_INCREMENTAL)
 
-#replace categorical
-# matrix of same size as categorical
-size = categorical.shape
-res = np.zeros(size)
-d = {}
 
-#change categorical values to numeric encoding
-for i in range(categorical.shape[1]):
-    temp = CatEncoder(categorical.iloc[::,i])
-    res[:,i] = temp[0]
-    d[categorical.iloc[::,i].name] = temp[1]
+ann.train_on_data(training, max_iterations, iterations_between_reports, desired_error)
 
-#join the 2 matrices into a numpy matrix
-numerical = numerical.as_matrix()
-data_trans = np.concatenate((numerical,res),1)
+ann.get_MSE()
 
-for i in range(2):
-    string = " "
-    print string.join(str(data.iloc[::,1]))
+ann.save("~/Users/jamesquadrino/testnet.config")
