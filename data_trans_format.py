@@ -16,7 +16,7 @@ def CatEncoder(col):
 engine = create_engine('mysql://root:joemoney@localhost:3306/cat')
 
 #query your DB using pandas, and your engine
-data = pd.read_sql("SELECT train.tube_assembly_id, train.supplier, train.quote_date, train.annual_usage, train.min_order_quantity, train.bracket_pricing, train.quantity, train.cost, tube.material_id, tube.diameter, tube.material_id, tube.diameter, tube.wall, tube.length, tube.num_bends, tube.bend_radius, tube.end_a_1x, tube.end_a_2x, tube.end_x_1x, tube.end_x_2x, tube.end_a, tube.end_x, tube.num_boss, tube.num_bracket, tube.other, specs.spec1, specs.spec2, specs.spec3, specs.spec4, specs.spec5, specs.spec6, specs.spec7, specs.spec8, specs.spec9, specs.spec10 FROM train_set JOIN tube ON train.tube_assembly_id = tube.tube_assembly_id JOIN specs ON train.tube_assembly_id = specs.tube_assembly_id",
+data = pd.read_sql("SELECT train.tube_assembly_id, train.supplier, train.quote_date, train.annual_usage, train.min_order_quantity, train.bracket_pricing, train.quantity, train.cost, tube.material_id, tube.diameter, tube.material_id, tube.diameter, tube.wall, tube.length, tube.num_bends, tube.bend_radius, tube.end_a_1x, tube.end_a_2x, tube.end_x_1x, tube.end_x_2x, tube.end_a, tube.end_x, tube.num_boss, tube.num_bracket, tube.other, specs.spec1, specs.spec2, specs.spec3, specs.spec4, specs.spec5, specs.spec6, specs.spec7, specs.spec8, specs.spec9, specs.spec10 FROM train_set as train  JOIN tube ON train.tube_assembly_id = tube.tube_assembly_id JOIN specs ON train.tube_assembly_id = specs.tube_assembly_id",
                   engine)
 
 #replace nas with 0
