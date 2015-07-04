@@ -13,7 +13,7 @@ def CatEncoder(col):
 
 #create an engine to connect/add tables/read from sql
 #requires credentials for your db, the ones i have entered are default for a database named cat
-engine = create_engine('mysql://root:@localhost:3306/cat')
+engine = create_engine('mysql://root:joemoney@localhost:3306/cat')
 
 #query your DB using pandas, and your engine
 print "Querying data..."
@@ -67,7 +67,7 @@ data_trans.columns = n
 
 print "writing file"
 shape = data_trans.shape
-f = open("/Users/jamesquadrino/git/svidur/data_train.data", "w")
+f = open("/home/ubuntu/svidur/data_train.data", "w")
 text = str(shape[0]) + " " + str(shape[1]-1) + " " + str(1) + "\n"
 f.writelines(text)
 
