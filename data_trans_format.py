@@ -1,8 +1,8 @@
 #pandas is for r dataframe like structures in python, highly recommended generally
 import pandas as pd
 import numpy as np
+import sqlengine
 from sklearn import preprocessing
-from sqlalchemy import create_engine #sql alchemy module, to connect to your database
 
 def CatEncoder(col):
     t = col.astype("category")
@@ -26,10 +26,8 @@ def fannwriter(dataframe, path):
       f.writelines((" ".join([str(l) for l in x.iloc[i,].values])) + "\n" + str(y.iloc[i]) + "\n")
     f.close()
     return "file successfully written"
-
-#create an engine to connect/add tables/read from sql
-#requires credentials for your db, the ones i have entered are default for a database named cat
-engine = create_engine('mysql://root:joemoney@localhost:3306/cat')
+    
+engine = sqlengine.connect_to_db("ubuntu")
 
 #query your DB using pandas, and your engine
 print "Querying data..."
@@ -42,7 +40,6 @@ specs.spec1, specs.spec2, specs.spec3, specs.spec4, specs.spec5, specs.spec6,\
 specs.spec7, specs.spec8, specs.spec9, specs.spec10 \
 FROM train_set as train JOIN tube ON train.tube_assembly_id = tube.tube_assembly_id JOIN specs ON train.tube_assembly_id = specs.tube_assembly_id"),
 engine)
-
 
 print "cleaning/processing data"
 #replace nas with 0
