@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 from sqlalchemy import create_engine #sql alchemy module, to connect to your database
+from sklearn.cross_validation import train_test_split
 
 def CatEncoder(col):
     t = col.astype("category")
@@ -65,20 +66,41 @@ data_trans = preprocessing.scale(data_trans)
 data_trans = pd.DataFrame(data_trans)
 data_trans.columns = n
 
-print "writing file"
-shape = data_trans.shape
+train, test = train_test_split(data, train_size = 0.8)
+
+print "writing train file"
+shape = train.shape
 f = open("/home/ubuntu/svidur/data_train.data", "w")
 text = str(shape[0]) + " " + str(shape[1]-1) + " " + str(1) + "\n"
 f.writelines(text)
 
-y = data_trans.ix[0,"cost"]
-x = data_trans.iloc[0,].drop("cost")
+y = train.ix[0,"cost"]
+x = train.iloc[0,].drop("cost")
 string = " "
 f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
 
 for i in np.arange(1,shape[0]):
-    y = data_trans.ix[i,"cost"]
-    x = data_trans.iloc[i,].drop("cost")
+    y = train.ix[i,"cost"]
+    x = train.iloc[i,].drop("cost")
+    string = " "
+    f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
+
+f.close()
+
+print "writing test file"
+shape = test.shape
+f = open("/home/ubuntu/svidur/data_test.data", "w")
+text = str(shape[0]) + " " + str(shape[1]-1) + " " + str(1) + "\n"
+f.writelines(text)
+
+y = test.ix[0,"cost"]
+x = test.iloc[0,].drop("cost")
+string = " "
+f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
+
+for i in np.arange(1,shape[0]):
+    y = test.ix[i,"cost"]
+    x = test.iloc[i,].drop("cost")
     string = " "
     f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
 

@@ -26,6 +26,20 @@ ann.set_train_error_function(pyfann.ERRORFUNC_LINEAR)
 
 ann.train_on_data(training, max_iterations, iterations_between_reports, desired_error)
 
-ann.get_MSE()
+print "Testing network"
+test_data = libfann.training_data()
+test_data.read_train_from_file("/home/ubuntu/svidur/data_test.data")
+
+ann.reset_MSE()
+ann.test_data(test_data)
+print "MSE error on test data: %f" % ann.get_MSE()
+
+print "Testing network again"
+ann.reset_MSE()
+input=test_data.get_input()
+output=test_data.get_output()
+for i in range(len(input)):
+    ann.test(input[i], output[i])
+print "MSE error on test data: %f" % ann.get_MSE()
 
 ann.save("/home/ubuntu/svidur/netattempt.net")
