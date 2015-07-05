@@ -1,7 +1,7 @@
 #pandas is for r dataframe like structures in python, highly recommended generally
 import pandas as pd
 import numpy as np
-from sklearn import preprocessing, cross_validation
+from sklearn import preprocessing
 from sqlalchemy import create_engine #sql alchemy module, to connect to your database
 
 def CatEncoder(col):
@@ -10,6 +10,22 @@ def CatEncoder(col):
     original = dict((key, value) for (key, value) in zip(t_categories, range(len(t_categories))))
     t2 = t.cat.rename_categories(original.values())
     return t2, original
+    
+def fannwriter(dataframe, path):
+    print "writing file"
+    shape = dataframe.shape
+    f = open(path, "w")
+    text = str(shape[0]) + " " + str(shape[1]-1) + " " + str(1) + "\n"
+    f.writelines(text)
+    y = dataframe["cost"]
+    x = dataframe.drop("cost",1)
+    t1 = y.iloc[0]
+    t2 = x.iloc[0,]
+    f.writelines((" ".join([str(l) for l in t2.values])) + "\n" + str(t1) + "\n")
+    for i in np.arange(1,shape[0]):
+      f.writelines((" ".join([str(l) for l in x.iloc[i,].values])) + "\n" + str(y.iloc[i]) + "\n")
+    f.close()
+    return "file successfully written"
 
 #create an engine to connect/add tables/read from sql
 #requires credentials for your db, the ones i have entered are default for a database named cat
@@ -65,42 +81,11 @@ data_trans = preprocessing.scale(data_trans)
 data_trans = pd.DataFrame(data_trans)
 data_trans.columns = n
 
-train, test = cross_validation.train_test_split(data_trans, train_size = 0.8)
+msk = np.random.rand(len(data_trans)) < 0.8
+train = data_trans[msk]
+test  = data_trans[-msk]
 
-print "writing train file"
-shape = train.shape
-f = open("/home/ubuntu/svidur/data_train.data", "w")
-text = str(shape[0]) + " " + str(shape[1]-1) + " " + str(1) + "\n"
-f.writelines(text)
+fannwriter(train, "/home/ubuntu/svidur/data_train.data")
+fannwriter(test, "/home/ubuntu/svidur/data_test.data")
 
-y = train.ix[0,"cost"]
-x = train.iloc[0,].drop("cost")
-string = " "
-f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
 
-for i in np.arange(1,shape[0]):
-    y = train.ix[i,"cost"]
-    x = train.iloc[i,].drop("cost")
-    string = " "
-    f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
-
-f.close()
-
-print "writing test file"
-shape = test.shape
-f = open("/home/ubuntu/svidur/data_test.data", "w")
-text = str(shape[0]) + " " + str(shape[1]-1) + " " + str(1) + "\n"
-f.writelines(text)
-
-y = test.ix[0,"cost"]
-x = test.iloc[0,].drop("cost")
-string = " "
-f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
-
-for i in np.arange(1,shape[0]):
-    y = test.ix[i,"cost"]
-    x = test.iloc[i,].drop("cost")
-    string = " "
-    f.writelines((" ".join([str(l) for l in x.values])) + "\n" + str(y) + "\n")
-
-f.close()
