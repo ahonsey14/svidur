@@ -49,4 +49,4 @@ ann.cascadetrain_on_data(train_data, max_neurons, neurons_between_reports, desir
 
 ann.print_connections();
 
-ann.save("nets/xor_float.net");
+ann.save("/home/ubuntu/svidur/nets/xor_float.net");
