@@ -1,16 +1,46 @@
-#pandas is for r dataframe like structures in python, highly recommended generally
-import pandas as pd
-from sqlalchemy import create_engine #sql alchemy module, to connect to your database
-from fann2 import libfann #neural net, not implemented yet
+from fann2 import libfann as pyfann
 
-#create an engine to connect/add tables/read from sql
-#requires credentials for your db, the ones i have entered are default for a database named cat
-engine = create_engine('mysql://root:@localhost:3306/cat')
+connection_rate = .5
+learning_rate = 0.5
 
-#query your DB using pandas, and your engine
-data = pd.read_sql("SELECT train.tube_assembly_id, train.supplier, train.quote_date, train.annual_usage, train.min_order_quantity, train.bracket_pricing, train.quantity, train.cost, tube.material_id, tube.diameter, tube.material_id, tube.diameter, tube.wall, tube.length, tube.num_bends, tube.bend_radius, tube.end_a_1x, tube.end_a_2x, tube.end_x_1x, tube.end_x_2x, tube.end_a, tube.end_x, tube.num_boss, tube.num_bracket, tube.other, specs.spec1, specs.spec2, specs.spec3, specs.spec4, specs.spec5, specs.spec6, specs.spec7, specs.spec8, specs.spec9, specs.spec10 FROM train JOIN tube ON train.tube_assembly_id = tube.tube_assembly_id JOIN specs ON train.tube_assembly_id = specs.tube_assembly_id",
-                  engine)
-#replace nas with 0
-data = data.fillna(0)
+desired_error = 0.00000001
+max_iterations = 3500
+iterations_between_reports = 50
 
 
+training = pyfann.training_data()
+training.read_train_from_file("/home/ubuntu/svidur/data_train.data")
+
+num_input = len(training.get_input()[0])
+num_neurons_hidden_1 = 24
+num_neurons_hidden_2 = 7
+num_output = len(training.get_output()[0])
+
+ann = pyfann.neural_net()
+#ann.create_sparse_array(connection_rate, (num_input,num_neurons_hidden_1,num_neurons_hidden_2, num_output))
+
+ann.create_standard_array((num_input,num_neurons_hidden_1,num_neurons_hidden_2,num_output))
+ann.set_activation_function_hidden(pyfann.ELLIOT_SYMMETRIC)
+ann.set_activation_function_output(pyfann.ELLIOT_SYMMETRIC)
+ann.set_training_algorithm(pyfann.TRAIN_BATCH)
+ann.set_train_error_function(pyfann.ERRORFUNC_LINEAR)
+
+ann.train_on_data(training, max_iterations, iterations_between_reports, desired_error)
+
+print "Testing network"
+test_data = pyfann.training_data()
+test_data.read_train_from_file("/home/ubuntu/svidur/data_test.data")
+
+ann.reset_MSE()
+ann.test_data(test_data)
+print "MSE error on test data: %f" % ann.get_MSE()
+
+print "Testing network again"
+ann.reset_MSE()
+input=test_data.get_input()
+output=test_data.get_output()
+for i in range(len(input)):
+    ann.test(input[i], output[i])
+print "MSE error on test data: %f" % ann.get_MSE()
+
+ann.save("/home/ubuntu/svidur/netattempt.net")

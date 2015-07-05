@@ -1,3 +1,6 @@
 pandas
 sqlalchemy
 fann2
+MySQL-python
+scipy
+scikit-learn
