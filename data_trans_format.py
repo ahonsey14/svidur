@@ -1,9 +1,8 @@
 #pandas is for r dataframe like structures in python, highly recommended generally
 import pandas as pd
 import numpy as np
-from sklearn import preprocessing
+from sklearn import preprocessing, cross_validation
 from sqlalchemy import create_engine #sql alchemy module, to connect to your database
-from sklearn.cross_validation import train_test_split
 
 def CatEncoder(col):
     t = col.astype("category")
@@ -66,7 +65,7 @@ data_trans = preprocessing.scale(data_trans)
 data_trans = pd.DataFrame(data_trans)
 data_trans.columns = n
 
-train, test = train_test_split(data, train_size = 0.8)
+train, test = cross_validation.train_test_split(data_trans, train_size = 0.8)
 
 print "writing train file"
 shape = train.shape
