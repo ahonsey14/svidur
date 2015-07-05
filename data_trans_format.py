@@ -1,8 +1,8 @@
 #pandas is for r dataframe like structures in python, highly recommended generally
 import pandas as pd
-import numpy as np
-import sqlengine
+import numpy as np 
 from sklearn import preprocessing
+import sqlengine
 
 def CatEncoder(col):
     t = col.astype("category")
